@@ -1,6 +1,6 @@
 <div class="extended-combat-hud fade-out-inactive-{{hudData.settings.fadeOutInactive}}">
 	<link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
-	<div class="weapon-sets">
+	<!-- <div class="weapon-sets">
 		<div class="weapon-set active" data-type="switchWeapons" data-value="set1">
 			<div class="set set-primary" draggable="true" data-set="set1p" style="background-image: url({{hudData.sets.set1.primary.img}})"></div>
 			<div class="set set-secondary" draggable="true" data-set="set1s" style="background-image: url({{hudData.sets.set1.secondary.img}})"></div>
@@ -13,8 +13,8 @@
 			<div class="set set-primary" draggable="true" data-set="set3p" style="background-image: url({{hudData.sets.set3.primary.img}})"></div>
 			<div class="set set-secondary" draggable="true" data-set="set3s" style="background-image: url({{hudData.sets.set3.secondary.img}})"></div>
 		</div>
-	</div>
-	<div class="ability-menu">
+	</div> -->
+	<!-- <div class="ability-menu">
 		<ul>
 			{{{generateSavingThrows "saves"}}}
 			{{{generateAbilities "skills"}}}
@@ -23,9 +23,9 @@
 		<ul class="ability-toggle">
 			<li class="ability ability-title">{{hudData.settings.localize.saves}} / {{hudData.settings.localize.skills}} / {{hudData.settings.localize.tools}}</li>
 		</ul>
-	</div>
+	</div> -->
 	<div class="portrait-hud">
-		<div class="death-saves">
+		<!-- <div class="death-saves">
 			<div class="death-save-success">
 			<div class="death-save-result-container">
 				<span>1</span>
@@ -39,7 +39,7 @@
 					<i class="fas fa-times"></i>
 				</div>
 			</div>
-		</div>
+		</div> -->
 		<div class="portrait-hud-image" style="background-image: url('{{hudData.actor.img}}');"></div>
 		<div class="portrait-stat-block">
 			<span data-hp-value="{{hudData.actor.system.attributes.hp.value}}"></span>
@@ -49,9 +49,9 @@
 		<div class="portrait-stat-block">
 			<span>{{hudData.settings.localize.AC}}</span>&nbsp;<span data-ac-value="{{hudData.actor.system.attributes.ac.value}}"></span>
 		</div>
-		<div class="portrait-stat-block">
+		<!-- <div class="portrait-stat-block">
 			<span>{{hudData.settings.localize.SpellDC}}</span>&nbsp;<span data-spell-dc="{{hudData.actor.system.attributes.spelldc}}"></span>
-		</div>
+		</div> -->
 		<div class="portrait-stat-block player-details{{#if hudData.settings.playerDetailsBottom}} player-details-bottom{{/if}}">
 			<span class="player-name">{{hudData.actor.name}}</span>
 				<span class="player-detail">
@@ -68,7 +68,7 @@
 	<div class="movement-hud">
 		<div class="movement-spaces">
 			<span class="movement-space"></span>
-			<span class="movement-space"></span>
+			<span class="mSovement-space"></span>
 			<span class="movement-space"></span>
 			<span class="movement-space"></span>
 			<span class="movement-space"></span>
@@ -76,7 +76,7 @@
 		</div>
 		<div class="movement-text"><span class="movement-current">6</span> <i class="fas fa-cube"></i><br/> {{hudData.settings.localize.of}} <span class="movement-max">6</span></div>
 	</div>
-	<div class="action-hud">
+	<!-- <div class="action-hud">
 		<div class="features-container is-spells" data-iscontainer="true" data-containeractiontype="actions" >
 			{{#each hudData.actions.spells}}
 			<div class="features-accordion">
@@ -235,5 +235,5 @@
 				<span class="action-element-title">{{hudData.settings.localize.endturn}}</span>
 			</div>
 		</div>
-	</div>
+	</div> -->
 </div>

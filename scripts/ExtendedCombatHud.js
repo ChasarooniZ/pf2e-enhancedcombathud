@@ -6,7 +6,7 @@ class CombatHud {
     console.log(this);
   }
 
-  async init(){
+  async init() {
     this._itemCount = this.actor.items.size
     this.settings = {
       isMagicItems: game.modules.get("magicitems")?.active,
@@ -67,67 +67,67 @@ class CombatHud {
       },
     };
     this.actions = {
-      attack: await this.getItems({
-        actionType: ["action"],
-        itemType: ["weapon"],
-        equipped: false,
-      }),
-      spells: await this.getItems({
-        actionType: ["action"],
-        itemType: ["spell"],
-        prepared: true,
-      }),
-      special: await this.getItems({
-        actionType: ["action", "legendary"],
-        itemType: ["feat"],
-      }),
-      consumables: await this.getItems({
-        actionType: ["action", "legendary"],
-        itemType: game.settings.get("enhancedcombathud", "showWeaponsItems") ? ["consumable", "equipment", "loot", "weapon"] : ["consumable", "equipment", "loot"],
-      }),
+      // attack: await this.getItems({
+      //   actionType: ["action"],
+      //   itemType: ["weapon"],
+      //   equipped: false,
+      // }),
+      // spells: await this.getItems({
+      //   actionType: ["action"],
+      //   itemType: ["spell"],
+      //   prepared: true,
+      // }),
+      // special: await this.getItems({
+      //   actionType: ["action", "legendary"],
+      //   itemType: ["feat"],
+      // }),
+      // consumables: await this.getItems({
+      //   actionType: ["action", "legendary"],
+      //   itemType: game.settings.get("enhancedcombathud", "showWeaponsItems") ? ["consumable", "equipment", "loot", "weapon"] : ["consumable", "equipment", "loot"],
+      // }),
     };
     this.bonus = {
-      attack: await this.getItems({
-        actionType: ["bonus"],
-        itemType: ["weapon"],
-        equipped: false,
-      }),
-      spells: await this.getItems({
-        actionType: ["bonus"],
-        itemType: ["spell"],
-        prepared: true,
-      }),
-      special: await this.getItems({
-        actionType: ["bonus"],
-        itemType: ["feat", "equipment", "consumable"],
-      }),
-      consumables: await this.getItems({
-        actionType: ["bonus"],
-        itemType: ["consumable"],
-      }),
+      // attack: await this.getItems({
+      //   actionType: ["bonus"],
+      //   itemType: ["weapon"],
+      //   equipped: false,
+      // }),
+      // spells: await this.getItems({
+      //   actionType: ["bonus"],
+      //   itemType: ["spell"],
+      //   prepared: true,
+      // }),
+      // special: await this.getItems({
+      //   actionType: ["bonus"],
+      //   itemType: ["feat", "equipment", "consumable"],
+      // }),
+      // consumables: await this.getItems({
+      //   actionType: ["bonus"],
+      //   itemType: ["consumable"],
+      // }),
     };
     this.reactions = {
-      attack: await this.getItems({
-        actionType: ["reaction", "reactiondamage", "reactionmanual"],
-        itemType: ["weapon"],
-        equipped: true,
-      }),
-      spells: await this.getItems({
-        actionType: ["reaction", "reactiondamage", "reactionmanual"],
-        itemType: ["spell"],
-        prepared: true,
-      }),
-      special: await this.getItems({
-        actionType: ["reaction", "reactiondamage", "reactionmanual"],
-        itemType: ["feat"],
-      }),
-      consumables: await this.getItems({
-        actionType: ["reaction", "reactiondamage", "reactionmanual"],
-        itemType: ["consumable"],
-      }),
+      // attack: await this.getItems({
+      //   actionType: ["reaction", "reactiondamage", "reactionmanual"],
+      //   itemType: ["weapon"],
+      //   equipped: true,
+      // }),
+      // spells: await this.getItems({
+      //   actionType: ["reaction", "reactiondamage", "reactionmanual"],
+      //   itemType: ["spell"],
+      //   prepared: true,
+      // }),
+      // special: await this.getItems({
+      //   actionType: ["reaction", "reactiondamage", "reactionmanual"],
+      //   itemType: ["feat"],
+      // }),
+      // consumables: await this.getItems({
+      //   actionType: ["reaction", "reactiondamage", "reactionmanual"],
+      //   itemType: ["consumable"],
+      // }),
     };
     this.free = {
-      special: await this.getItems({ actionType: ["special"], itemType: ["feat"] }),
+      // special: await this.getItems({ actionType: ["special"], itemType: ["feat"] }),
     };
     this.other = {
       portrait: this.actor.img,
@@ -137,18 +137,15 @@ class CombatHud {
       movement: {
         max: Math.round(
           Math.max(
-            this.actor.system.attributes.movement.burrow,
-            this.actor.system.attributes.movement.climb,
-            this.actor.system.attributes.movement.fly,
-            this.actor.system.attributes.movement.swim,
-            this.actor.system.attributes.movement.walk
+            this.actor.system.attributes.speed.total,
+            ...this.actor.system.attributes.speed.otherSpeeds?.map(spd => spd.total)
           ) / canvas.dimensions.distance
         ),
         current: 0,
         moved: 0,
       },
       ac: this.actor.system.attributes.ac.value,
-      classes: this.getClassesAsString(),
+      classes: this.actor.class.name,
       specialItemsNames: {
         disengage: game.i18n.localize("enhancedcombathud.items.disengage.name"),
         hide: game.i18n.localize("enhancedcombathud.items.hide.name"),
@@ -169,95 +166,55 @@ class CombatHud {
       reaction: true,
     };
     this.skills = this.actor.system.skills;
-    this.saves = this.actor.system.abilities;
-    this.tools = this.actor.items
-      .filter((i) => i.type == "tool")
-      .map((item, index) => {
-        let toolAbility = item.abilityMod || "str";
-        let abilityModifiers = this.actor.system.abilities[toolAbility];
-        let toolProficiency = Math.ceil(
-          item.system.proficient * this.actor.system.attributes.prof
-        );
-        return {
-          ability: toolAbility,
-          bonus: 0,
-          label: item.name,
-          mod: abilityModifiers.mod,
-          passive: 8 + toolProficiency + abilityModifiers.mod,
-          prof: toolProficiency,
-          total: toolProficiency + abilityModifiers.mod,
-          type: "Number",
-          proficient: item.system.proficient,
-        };
-      });
+    this.saves = this.actor.system.saves;
+    // this.tools = this.actor.items
+    //   .filter((i) => i.type == "tool")
+    //   .map((item, index) => {
+    //     let toolAbility = item.abilityMod || "str";
+    //     let abilityModifiers = this.actor.system.abilities[toolAbility];
+    //     let toolProficiency = Math.ceil(
+    //       item.system.proficient * this.actor.system.attributes.prof
+    //     );
+    //     return {
+    //       ability: toolAbility,
+    //       bonus: 0,
+    //       label: item.name,
+    //       mod: abilityModifiers.mod,
+    //       passive: 8 + toolProficiency + abilityModifiers.mod,
+    //       prof: toolProficiency,
+    //       total: toolProficiency + abilityModifiers.mod,
+    //       type: "Number",
+    //       proficient: item.system.proficient,
+    //     };
+    //   });
 
     // Localize skills
-    Object.keys(CONFIG.DND5E.skills).forEach((skill) => {
-      this.skills[skill].label = CONFIG.DND5E.skills[skill];
-      this.skills[skill].proficient = this.skills[skill].value;
-      this.skills[skill].tooltip = game.i18n.localize(
-        `enhancedcombathud.skills.${skill}.tooltip`
-      );
-    });
-    
+    // Object.keys(CONFIG.DND5E.skills).forEach((skill) => {
+    //   this.skills[skill].label = CONFIG.DND5E.skills[skill];
+    //   this.skills[skill].proficient = this.skills[skill].value;
+    //   this.skills[skill].tooltip = game.i18n.localize(
+    //     `enhancedcombathud.skills.${skill}.tooltip`
+    //   );
+    // });
+
     let sortableSkills = [];
     for (let skill in this.skills) {
       sortableSkills.push([skill, this.skills[skill]]);
     }
     sortableSkills.sort((a, b) => a[1].label.label < b[1].label.label ? -1 : 1);
     let tempSkills = {};
-    sortableSkills.forEach(function(item){
-      tempSkills[item[0]]=item[1];
+    sortableSkills.forEach(function (item) {
+      tempSkills[item[0]] = item[1];
     })
     this.skills = tempSkills;
 
     //
-    Object.keys(CONFIG.DND5E.abilities).forEach((ability) => {
-      this.saves[ability].label = CONFIG.DND5E.abilities[ability];
-      this.saves[ability].total = this.saves[ability].save;
-      this.saves[ability].tooltip = game.i18n.localize(
-        `enhancedcombathud.abilities.${ability}.tooltip`
-      );
-    });
+    for (save of this.saves) {
+      this.saves[save].label = save.label;
+      this.saves[save].total = save.totalModifier;
+      this.saves[save].tooltip = save.breakdown;
+    }
     return this;
-  }
-
-  getClassesAsString() {
-    try {
-      let classes = this.actor.system.classes;
-      if (!classes) return "";
-      if (Object.keys(classes).length === 0)
-        return this.actor.labels.creatureType;
-      let string = "";
-      for (let [key, value] of Object.entries(classes)) {
-        string += "lvl " + value.levels + " ";
-        string += key[0].toUpperCase() + key.substring(1);
-        string += value.subclass
-          ? " (" +
-            value.subclass[0].toUpperCase() +
-            value.subclass.substring(1) +
-            ") "
-          : " ";
-      }
-      return string;
-    } catch {
-      return "";
-    }
-  }
-
-  static async getMagicItemItem(magicItem){
-    if(!game.modules.get("magicitems")?.active) return null;
-    let mi = game.items.get(magicItem.id) ?? await game.packs.get(magicItem.pack)?.getDocument(magicItem.id)
-    return mi 
-  }
-
-  static async getMagicItemByName(actor, name){
-    if(!game.modules.get("magicitems")?.active) return null;
-    for(let i of MagicItems.actor(actor.id).items.filter(item => item.visible && item.active)){
-      let mItem = i.spells.find(spell => spell.name == name);
-      if(mItem) return await CombatHud.getMagicItemItem(mItem);
-    }
-    return null;
   }
 
   async getItems(filters) {
@@ -266,13 +223,13 @@ class CombatHud {
     const equipped = filters.equipped;
     const prepared = filters.prepared;
     let magicitems = [];
-    if(this.settings.isMagicItems){
-      for(let mi of MagicItems.actor(this.actor.id).items.filter(item => item.visible && item.active)){
-        for(let spell of mi.spells){
+    if (this.settings.isMagicItems) {
+      for (let mi of MagicItems.actor(this.actor.id).items.filter(item => item.visible && item.active)) {
+        for (let spell of mi.spells) {
           const item = await CombatHud.getMagicItemItem(spell);
-          if(item){
-            item.isMagicItem=true;
-           magicitems.push(item)
+          if (item) {
+            item.isMagicItem = true;
+            magicitems.push(item)
           }
         }
       }
@@ -288,10 +245,9 @@ class CombatHud {
         itemData.preparation?.prepared === false &&
         itemData.preparation?.mode == "prepared" &&
         itemData.level !== 0
-      )
-        {
-        if(!i.isMagicItem)  return false;
-        }
+      ) {
+        if (!i.isMagicItem) return false;
+      }
       if (
         actionType &&
         actionType.includes(itemData.activation?.type) &&
@@ -402,22 +358,22 @@ class CombatHud {
     return sets;
   }
   _render() {
-    if(this.token.actor)canvas.hud.enhancedcombathud.bind(this.token);
+    if (this.token.actor) canvas.hud.enhancedcombathud.bind(this.token);
   }
   async switchSets(active) {
     await this.actor.setFlag("enhancedcombathud", "activeSet", active);
     if (!this.settings.switchEquip) return;
 
-    
+
     const updates = [];
-    for(let [k,v] of Object.entries(this.sets)){
-      if(v.primary) updates.push({_id: v.primary.id, "system.equipped": v.primary == this.sets.active.primary});
-      if(v.secondary) updates.push({_id: v.secondary.id, "system.equipped": v.secondary == this.sets.active.secondary});
+    for (let [k, v] of Object.entries(this.sets)) {
+      if (v.primary) updates.push({ _id: v.primary.id, "system.equipped": v.primary == this.sets.active.primary });
+      if (v.secondary) updates.push({ _id: v.secondary.id, "system.equipped": v.secondary == this.sets.active.secondary });
     }
 
     await this.actor.updateEmbeddedDocuments("Item", updates);
   }
-  
+
   set hasAction(value) {
     $(canvas.hud.enhancedcombathud.element)
       .find('.actions-container.has-actions[data-actionbartype="actions"]')
@@ -436,7 +392,7 @@ class CombatHud {
   get spellSlots() {
     return this.actor.system.spells;
   }
-  get movementColor() {}
+  get movementColor() { }
 }
 
 class CombatHudCanvasElement extends BasePlaceableHUD {
@@ -457,7 +413,7 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
     const actor = object.document.actor;
     if (!actor) return ui.notifications.error(game.i18n.localize("enhancedcombathud.err.invalid"));
     const type = actor.type;
-    if(type !== "npc" && type !== "character") return ui.notifications.error(game.i18n.localize("enhancedcombathud.err.invalid"));
+    if (type !== "npc" && type !== "character") return ui.notifications.error(game.i18n.localize("enhancedcombathud.err.invalid"));
     if (this._crashed) {
       this._crashed = false;
       this._state = this.constructor.RENDER_STATES.ERROR;
@@ -466,7 +422,7 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
   }
 
   async getData() {
-    try {      
+    try {
       const data = super.getData();
       data.hudData = await new CombatHud(this.object).init();
       this.hudData = data.hudData;
@@ -478,10 +434,10 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
     }
   }
 
-  checkReRender(item){
-    try{
-      if(item.parent.id == this.hudData.actor.id && this.hudData._itemCount != item.parent.items.size)this.render(true)
-    }catch{}
+  checkReRender(item) {
+    try {
+      if (item.parent.id == this.hudData.actor.id && this.hudData._itemCount != item.parent.items.size) this.render(true)
+    } catch { }
   }
 
   close() {
@@ -542,7 +498,7 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
     let scale = true//game.settings.get("enhancedcombathud", "noAutoscale")
       ? game.settings.get("enhancedcombathud", "scale")
       : (1 / (echHUDWidth / windowWidth)) *
-        game.settings.get("enhancedcombathud", "scale");
+      game.settings.get("enhancedcombathud", "scale");
 
     const position = {
       bottom: $(".extended-combat-hud").hasClass("minimize-hud")
@@ -635,7 +591,7 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
     let scale = true //game.settings.get("enhancedcombathud", "noAutoscale")
       ? game.settings.get("enhancedcombathud", "scale")
       : (1 / (echHUDWidth / windowWidth)) *
-        game.settings.get("enhancedcombathud", "scale");
+      game.settings.get("enhancedcombathud", "scale");
 
     $(".extended-combat-hud").css({
       transform: `scale(${scale > 1 ? 1 : scale})`,
@@ -659,7 +615,7 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
       let confimed;
       if (useCE) {
         confimed = true;
-        await game.dfreds.effectInterface.toggleEffect(itemName, { overlay: false, uuids : [this.object.actor.uuid] });
+        await game.dfreds.effectInterface.toggleEffect(itemName, { overlay: false, uuids: [this.object.actor.uuid] });
       } else {
         confimed = specialItem ? await specialItem.use() : await this.roller.rollItem(itemName, event);
       }
@@ -673,21 +629,21 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
           );
         }
       }
-      if (!item && !CombatHud.getMagicItemByName(this.actor ,itemName)){
+      if (!item && !CombatHud.getMagicItemByName(this.actor, itemName)) {
         $(event.currentTarget).remove();
       } else {
         if (item.system.consume?.type) {
           switch (item.system.consume.type) {
             case "ammo":
               let ammoItem = this.hudData.actor.items.find(
-                    (i) => i.id == item.system.consume?.target
-                  );
+                (i) => i.id == item.system.consume?.target
+              );
               let ammoCount = confimed
                 ? ammoItem.system?.quantity -
-                  item.system.consume?.amount
+                item.system.consume?.amount
                 : ammoItem?.system?.quantity;
-                $(".extended-combat-hud").find(`[data-set] .action-element-title:contains(${itemName})`).closest('div').each((index, element) => element.dataset.itemCount = ammoCount)
-                event.currentTarget.dataset.itemCount = ammoCount;
+              $(".extended-combat-hud").find(`[data-set] .action-element-title:contains(${itemName})`).closest('div').each((index, element) => element.dataset.itemCount = ammoCount)
+              event.currentTarget.dataset.itemCount = ammoCount;
               break;
             case "attribute":
               let value = Object.byString(
@@ -733,7 +689,7 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
       // Allow User to hover over Tooltip
       if (game.Levels3DPreview) {
         this.clearRanges();
-        game.Levels3DPreview.rangeFinders.forEach(rf => {rf.destroy();})
+        game.Levels3DPreview.rangeFinders.forEach(rf => { rf.destroy(); })
       }
       setTimeout(() => {
         //$(".ech-tooltip:not(.is-hover)").remove();
@@ -876,14 +832,12 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
             numberOfFeatures > 3 ? 450 + 53 : numberOfFeatures * 150 + 53;
 
           $element.css({
-            width: `${
-              numberOfFeatures > 3 ? 450 + 53 : numberOfFeatures * 150 + 53
-            }px`,
+            width: `${numberOfFeatures > 3 ? 450 + 53 : numberOfFeatures * 150 + 53
+              }px`,
           });
           $element.find(".features-accordion-content").css({
-            "min-width": `${
-              numberOfFeatures > 3 ? 450 : numberOfFeatures * 150
-            }px`,
+            "min-width": `${numberOfFeatures > 3 ? 450 : numberOfFeatures * 150
+              }px`,
           });
         });
 
@@ -974,8 +928,8 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
     let isAmmo = item.system.consume?.type == "ammo";
     let ammoItem = isAmmo
       ? this.hudData.actor.items.find(
-          (i) => i.id == item.system.consume?.target
-        )
+        (i) => i.id == item.system.consume?.target
+      )
       : null;
     element.toggleClass("has-count", isAmmo);
     if (element[0])
@@ -1000,14 +954,14 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
   }
 
   resetActionsUses() {
-    if(!this.hudData) return;
+    if (!this.hudData) return;
     this.hudData.hasAction = true;
     this.hudData.hasBonus = true;
     this.hudData.hasReaction = true;
   }
 
   newRound() {
-    if(!this.hudData) return;
+    if (!this.hudData) return;
     this.resetActionsUses();
     this.hudData.other.movement.current = this.hudData.other.movement.max;
     this.hudData.other.movement.moved = 0;
@@ -1081,17 +1035,17 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
     this.updateDS();
   }
 
-  updateDS(){
+  updateDS() {
     const actor = this.object.actor;
     const $element = $(this.element).find(".death-saves");
-    if(!actor || !actor.system.attributes.death) {
+    if (!actor || !actor.system.attributes.death) {
       $element.hide();
       return;
     }
     const isDead = actor.system.attributes.hp.value <= 0;
     const failed = actor.system.attributes.death.failure;
     const success = actor.system.attributes.death.success;
-    if(!isDead) {
+    if (!isDead) {
       $element.hide();
       return;
     }
@@ -1117,7 +1071,7 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
   }
 
   toggleMacroPlayers(togg) {
-    if(!game.settings.get("enhancedcombathud", "hideMacroPlayers")) return;
+    if (!game.settings.get("enhancedcombathud", "hideMacroPlayers")) return;
     if (togg || !game.settings.get("enhancedcombathud", "hideMacroPlayers")) {
       $("#players")[0].style.visibility = "visible";
       $("#hotbar").show(500);
@@ -1159,11 +1113,10 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
 
       for (let index = 0; index < spellSlotDetails.max; index++) {
         //spellSlots.push(index < spellSlotDetails.value);
-        spellSlots += `<span class="spell-slot spell-${
-          index < spellSlotDetails.max - spellSlotDetails.value
+        spellSlots += `<span class="spell-slot spell-${index < spellSlotDetails.max - spellSlotDetails.value
             ? "used"
             : "available"
-        }"></span>`;
+          }"></span>`;
       }
     }
     return spellSlots;
@@ -1277,7 +1230,7 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
           break;
       }
     }
-    description = await TextEditor.enrichHTML(description, {async: true});
+    description = await TextEditor.enrichHTML(description, { async: true });
 
     const tooltip = ({
       title,
@@ -1304,25 +1257,24 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
             <div class="ech-tooltip-details">
               <div>
                 <span>${game.i18n.localize(
-                  "enhancedcombathud.tooltip.target.name"
-                )}</span>
+        "enhancedcombathud.tooltip.target.name"
+      )}</span>
                 <span>${target}</span>
               </div>
               <div>
                 <span>${game.i18n.localize(
-                  "enhancedcombathud.tooltip.range.name"
-                )}</span>
+        "enhancedcombathud.tooltip.range.name"
+      )}</span>
                 <span>${range}</span></div>
               </div>
             <div class="ech-tooltip-properties">
               <h3>${game.i18n.localize(
-                "enhancedcombathud.tooltip.properties.name"
-              )}</h3>
+        "enhancedcombathud.tooltip.properties.name"
+      )}</h3>
               ${properties.join("\n")}
             </div>
-            <i style="font-size: 0.8rem;">${
-              materialComponents.length > 0 ? "*-" + materialComponents : ""
-            }</i>
+            <i style="font-size: 0.8rem;">${materialComponents.length > 0 ? "*-" + materialComponents : ""
+        }</i>
           </div>
         </div>`;
     };
@@ -1383,7 +1335,7 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
   }
 
   clearRanges(force = false) {
-    if(this.isTargetPicker && !force) return;
+    if (this.isTargetPicker && !force) return;
     if (this.normalRange) {
       this.normalRange.remove();
       this.normalRange = null;
@@ -1397,47 +1349,47 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
   static getRangeForItem(item) {
     const touchRange = item.system.range.units == "touch" ? canvas?.scene?.grid?.distance : null;
     return {
-        range: Math.max(item.system?.range?.value ?? touchRange, item.system?.range?.long ?? 0) ?? Infinity,
-        normal: item.system?.range?.value ?? touchRange,
-        long: item.system?.range?.long ?? null,
+      range: Math.max(item.system?.range?.value ?? touchRange, item.system?.range?.long ?? 0) ?? Infinity,
+      normal: item.system?.range?.value ?? touchRange,
+      long: item.system?.range?.long ?? null,
     };
   }
 
   showRangeRings(normal, long) {
-    if(!game.Levels3DPreview?._active) return;
+    if (!game.Levels3DPreview?._active) return;
     this.clearRanges();
     if (normal) this.normalRange = new game.Levels3DPreview.CONFIG.entityClass.RangeRingEffect(this.object, normal);
     if (long) this.longRange = new game.Levels3DPreview.CONFIG.entityClass.RangeRingEffect(this.object, long, "#ff0000");
   }
 
-  async showRangeFinder(itemName){
-    if(!game.Levels3DPreview?._active || !itemName) return;
+  async showRangeFinder(itemName) {
+    if (!game.Levels3DPreview?._active || !itemName) return;
     const sett = game.settings.get("enhancedcombathud", "rangefinder")
     const showRangeFinder = sett != "none";
     const item = this.hudData.actor.items.find((i) => i.name == itemName) ?? await CombatHud.getMagicItemByName(this.hudData.actor, itemName);
     if (!item) return;
     const { range, normal, long } = CombatHudCanvasElement.getRangeForItem(item);
     if (!canvas.hud.enhancedcombathud.isTargetPicker) this.showRangeRings(normal, long);
-    if(!showRangeFinder) return;
+    if (!showRangeFinder) return;
     const isMidi = game.modules.get("midi-qol")?.active
     const showPercentage = sett == "full";
-    const RangeFinder = game.Levels3DPreview.CONFIG.entityClass.RangeFinder; 
+    const RangeFinder = game.Levels3DPreview.CONFIG.entityClass.RangeFinder;
     game.Levels3DPreview.rangeFinders.forEach(rf => {
-          rf.destroy();
+      rf.destroy();
     })
     const visTokens = canvas.tokens.placeables.filter(t => t.visible)
-    for(let t of visTokens){
-      const dist = game.Levels3DPreview.helpers.ruler3d.measureMinTokenDistance(game.Levels3DPreview.tokens[this.object.id],game.Levels3DPreview.tokens[t.id])
+    for (let t of visTokens) {
+      const dist = game.Levels3DPreview.helpers.ruler3d.measureMinTokenDistance(game.Levels3DPreview.tokens[this.object.id], game.Levels3DPreview.tokens[t.id])
       const distDiff = range - dist;
-      if(distDiff >= 0){
-        const rollData = await this.rangeFinederGetPercent(item,t, isMidi);
+      if (distDiff >= 0) {
+        const rollData = await this.rangeFinederGetPercent(item, t, isMidi);
         const percent = rollData.chance;
-        let text = showPercentage && percent ? `${parseFloat(Math.clamped(percent, 0,100).toFixed(2))}%` : "";
-        if(rollData.adv || rollData.dis){
+        let text = showPercentage && percent ? `${parseFloat(Math.clamped(percent, 0, 100).toFixed(2))}%` : "";
+        if (rollData.adv || rollData.dis) {
           //text+= `(${rollData.adv ? "ADV" : ""}${rollData.dis ? "DIS" : ""})`
         }
-        new RangeFinder(t, {sources: [this.object], text: text})
-      }else{
+        new RangeFinder(t, { sources: [this.object], text: text })
+      } else {
         new RangeFinder(t, {
           sources: [this.object],
           text: `-${Math.abs(distDiff.toFixed(2))}${canvas.scene.grid.units}`,
@@ -1447,36 +1399,36 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
         })
       }
     }
-    
+
   }
 
-  async rangeFinederGetPercent(item, token, isMidi){
-    if(!item || !token.actor) return false;
+  async rangeFinederGetPercent(item, token, isMidi) {
+    if (!item || !token.actor) return false;
     const actor = token.actor
     const itemData = {
       toHit: item.abilityMod ? item.system.prof.flat + item.parent.system.abilities[item.abilityMod].mod : null,
       saveDC: item.parent.system.attributes.spelldc,
     };
     const targetData = {
-        ac : actor.system.attributes.ac.value,
-        save: item.system.save.ability ? actor.system.abilities[item.system.save.ability].save : null
+      ac: actor.system.attributes.ac.value,
+      save: item.system.save.ability ? actor.system.abilities[item.system.save.ability].save : null
     }
-    if(item.hasAttack){
+    if (item.hasAttack) {
       let midiBonus = null;
       let wf = null;
-      if(isMidi){
+      if (isMidi) {
         wf = new MidiQOL.DummyWorkflow(item.parent, item, ChatMessage.getSpeaker(this.object), [], {});
         await wf.simulateAttack(token);
-        midiBonus = wf.expectedAttackRoll - 10.5 + (wf.advantage ? 1 : wf.disadvantage ? -1 : 0)*3.325;
+        midiBonus = wf.expectedAttackRoll - 10.5 + (wf.advantage ? 1 : wf.disadvantage ? -1 : 0) * 3.325;
       }
-      const chanceToHit = (21-targetData.ac+(midiBonus ?? itemData.toHit))/20
+      const chanceToHit = (21 - targetData.ac + (midiBonus ?? itemData.toHit)) / 20
       return {
-        chance: Math.clamped(chanceToHit*100, 5, 95),
+        chance: Math.clamped(chanceToHit * 100, 5, 95),
         adv: wf?.advantage,
         dis: wf?.disadvantage
       }
-    }else if(item.hasSave){
-      const chanceToSave = 1-(21-itemData.saveDC+targetData.save)/20
+    } else if (item.hasSave) {
+      const chanceToSave = 1 - (21 - itemData.saveDC + targetData.save) / 20
       return {
         chance: chanceToSave * 100,
       }
@@ -1492,9 +1444,8 @@ class CombatHudCanvasElement extends BasePlaceableHUD {
     if (oldSetItem) await oldSetItem.setFlag("enhancedcombathud", set, false);
     await item.setFlag("enhancedcombathud", set, true);
     $(target).css({
-      "background-image": `url(${
-        this.hudData.sets[set.substring(0, set.length - 1)][ps].img
-      }`,
+      "background-image": `url(${this.hudData.sets[set.substring(0, set.length - 1)][ps].img
+        }`,
     });
     this.initSets();
   }
@@ -1516,60 +1467,60 @@ class ECHDiceRoller {
   constructor(actor) {
     this.actor = actor;
     this.modules = {
-        betterRolls: game.modules.get("betterrolls5e")?.active,
-        MidiQOL: game.modules.get("midi-qol")?.active,
+      betterRolls: game.modules.get("betterrolls5e")?.active,
+      MidiQOL: game.modules.get("midi-qol")?.active,
     };
   }
   async rollItem(itemName, event) {
     let finalItemToRoll = null;
     if (!this.modules.MidiQOL) {
-        //return await BetterRolls.quickRollByName(this.actor.data.name, itemName);
-        const actorId = this.actor.id;
-        const actorToRoll = canvas.tokens.placeables.find((t) => t.actor?.id === actorId)?.actor ?? game.actors.get(actorId);
-        const itemToRoll = actorToRoll?.items.find((i) => i.name === itemName) ?? CombatHud.getMagicItemByName(actorToRoll, itemName);
-        if (game.modules.get("itemacro")?.active && itemToRoll.hasMacro()) {
-            itemToRoll.executeMacro();
-        }
+      //return await BetterRolls.quickRollByName(this.actor.data.name, itemName);
+      const actorId = this.actor.id;
+      const actorToRoll = canvas.tokens.placeables.find((t) => t.actor?.id === actorId)?.actor ?? game.actors.get(actorId);
+      const itemToRoll = actorToRoll?.items.find((i) => i.name === itemName) ?? CombatHud.getMagicItemByName(actorToRoll, itemName);
+      if (game.modules.get("itemacro")?.active && itemToRoll.hasMacro()) {
+        itemToRoll.executeMacro();
+      }
 
-        if (!itemToRoll) {
-            return ui.notifications.warn(
-                game.i18n.format("DND5E.ActionWarningNoItem", {
-                    item: itemId,
-                    name: actorToRoll?.name ?? "[Not Found]",
-                }),
-            );
-        }
-        finalItemToRoll = itemToRoll;
+      if (!itemToRoll) {
+        return ui.notifications.warn(
+          game.i18n.format("DND5E.ActionWarningNoItem", {
+            item: itemId,
+            name: actorToRoll?.name ?? "[Not Found]",
+          }),
+        );
+      }
+      finalItemToRoll = itemToRoll;
     }
-    if (!finalItemToRoll) { 
+    if (!finalItemToRoll) {
       finalItemToRoll = this.actor.items.getName(itemName);
     }
     if (!finalItemToRoll) {
-        return await this.rollMagicItem(itemName);
+      return await this.rollMagicItem(itemName);
     }
     const useTargetPicker = game.settings.get("enhancedcombathud", "rangepicker")
-    if (useTargetPicker) {  
+    if (useTargetPicker) {
       const release = game.settings.get("enhancedcombathud", "rangepickerclear");
-      if(release) (canvas.tokens.placeables[0] ?? _token)?.setTarget(false);
+      if (release) (canvas.tokens.placeables[0] ?? _token)?.setTarget(false);
       const targetPicker = new ECHTargetPicker(finalItemToRoll, this.object);
       canvas.hud.enhancedcombathud.isTargetPicker = true;
       const res = await targetPicker.promise;
       canvas.hud.enhancedcombathud.isTargetPicker = false;
-      if(!res) return;
+      if (!res) return;
     }
     return await finalItemToRoll.use();
   }
 
-  async rollMagicItem(itemName){
+  async rollMagicItem(itemName) {
     const parent = this.getMagicItemParent(itemName)
     await MagicItems.actor(this.actor.id).rollByName(parent, itemName);
   }
 
-  getMagicItemParent(itemName){
+  getMagicItemParent(itemName) {
     const actor = this.actor;
-    for(let i of MagicItems.actor(actor.id).items.filter(item => item.visible && item.active)){
+    for (let i of MagicItems.actor(actor.id).items.filter(item => item.visible && item.active)) {
       let mItem = i.spells.find(spell => spell.name == itemName);
-      if(mItem) return i.name;
+      if (mItem) return i.name;
     }
     return null;
   }
@@ -1691,8 +1642,8 @@ class ECHDiceRoller {
   }
 }
 
-class ECHTargetPicker{
-  constructor (item, token) {
+class ECHTargetPicker {
+  constructor(item, token) {
     this.ranges = CombatHudCanvasElement.getRangeForItem(item);
     this.item = item;
     this.token = token;
@@ -1708,19 +1659,19 @@ class ECHTargetPicker{
       this.resolve = resolve;
       this.reject = reject;
     });
-    this.targetHook = Hooks.on("targetToken", (user, token, targeted) => { 
+    this.targetHook = Hooks.on("targetToken", (user, token, targeted) => {
       this.checkComplete();
     });
 
     this.movelistener = (event) => {
-        this.update(event);
+      this.update(event);
     };
-    this.clicklistener = (event) => { 
-      if(event.which === 3) {
+    this.clicklistener = (event) => {
+      if (event.which === 3) {
         this.end(false);
       }
     };
-    this.keyuplistener = (event) => { 
+    this.keyuplistener = (event) => {
       //check for + and - keys
       if (event.key === "+" || event.key === "=") {
         this.maxTargets++;
@@ -1735,11 +1686,11 @@ class ECHTargetPicker{
     this.init();
   }
 
-  checkComplete() { 
-      this.targetCount = game.user.targets.size;
-      if (this.targetCount >= this.maxTargets) {
-          this.end(true);
-      }
+  checkComplete() {
+    this.targetCount = game.user.targets.size;
+    if (this.targetCount >= this.maxTargets) {
+      this.end(true);
+    }
   }
 
   static getTargetCount(item) {
@@ -1747,16 +1698,16 @@ class ECHTargetPicker{
     const actionType = item.system.actionType;
     const targetType = item.system.target.type;
     if (validTargets.includes(targetType)) {
-        return item.system.target.value;
+      return item.system.target.value;
     } else {
-        if (actionType === "mwak" || actionType === "rwak") {
-            return 1;
-        }
+      if (actionType === "mwak" || actionType === "rwak") {
+        return 1;
+      }
     }
     return null;
   }
 
-  set targetCount(count) { 
+  set targetCount(count) {
     this._targetCount = count;
     this.update();
   }
@@ -1775,7 +1726,7 @@ class ECHTargetPicker{
     return this._maxTargets;
   }
 
-  init() { 
+  init() {
     const element = document.createElement("div");
     element.classList.add("ech-target-picker");
     document.body.appendChild(element);
@@ -1828,11 +1779,11 @@ Hooks.on("updateItem", (item, updates) => {
   if (!actor || actor?.id != canvas.hud.enhancedcombathud?.hudData?.actor?.id)
     return;
   let ad = actor.system.attributes;
-    canvas.hud.enhancedcombathud.updatePortrait(ad.hp, ad.ac.value);
+  canvas.hud.enhancedcombathud.updatePortrait(ad.hp, ad.ac.value);
 });
 
 Hooks.on("controlToken", (token, controlled) => {
-  if(token?.document?.actor?.type == "vehicle") return
+  if (token?.document?.actor?.type == "vehicle") return
   if (
     controlled &&
     canvas.hud.enhancedcombathud?.rendered &&
@@ -1841,7 +1792,7 @@ Hooks.on("controlToken", (token, controlled) => {
     canvas.hud.enhancedcombathud.close();
     setTimeout(() => {
       const ctoken = canvas.tokens.get(token.id)
-      if(!ctoken?.actor) return
+      if (!ctoken?.actor) return
       canvas.hud.enhancedcombathud.bind(ctoken);
     }, 250);
   }
@@ -1863,12 +1814,12 @@ Hooks.on("preUpdateToken", (token, updates) => {
     const segments = [{ ray }];
     let distance = Math.floor(
       canvas.grid.measureDistances(segments, { gridSpaces: true }) /
-        canvas.dimensions.distance
+      canvas.dimensions.distance
     );
     canvas.hud.enhancedcombathud.hudData.other.movement.moved += distance;
     const bars = Math.floor(
       canvas.hud.enhancedcombathud.hudData.other.movement.moved /
-        canvas.hud.enhancedcombathud.hudData.other.movement.max
+      canvas.hud.enhancedcombathud.hudData.other.movement.max
     );
     canvas.hud.enhancedcombathud.hudData.other.movement.current =
       canvas.hud.enhancedcombathud.hudData.other.movement.moved -
@@ -1881,7 +1832,7 @@ Hooks.on("updateCombat", (combat, updates) => {
   if (
     canvas.hud.enhancedcombathud?.hudData &&
     game.combat?.current?.tokenId ==
-      canvas.hud.enhancedcombathud?.hudData?.token?.id
+    canvas.hud.enhancedcombathud?.hudData?.token?.id
   ) {
     canvas.hud.enhancedcombathud.newRound();
   }
@@ -1909,22 +1860,22 @@ Hooks.on("combatStart", (combat, updates) => {
     !canvas.hud.enhancedcombathud?.rendered
   ) {
     if (!activeToken?.actor) return
-    activeToken.control({releaseOthers: true});
+    activeToken.control({ releaseOthers: true });
     $(`.control-tool[data-tool="echtoggle"]`).click();
     canvas.hud.enhancedcombathud.bind(activeToken);
   }
 });
 
 Hooks.on("deleteCombat", (combat) => {
-    if (
+  if (
     combat.scene == canvas.scene &&
-      game.settings.get("enhancedcombathud", "openCombatStart") &&
+    game.settings.get("enhancedcombathud", "openCombatStart") &&
     canvas.hud.enhancedcombathud?.rendered
-    ) {
-      $(`.control-tool[data-tool="echtoggle"]`).click();
-    }
+  ) {
+    $(`.control-tool[data-tool="echtoggle"]`).click();
+  }
 })
 
-Hooks.on("updateItem", (item) =>{canvas.hud.enhancedcombathud?.checkReRender(item)})
-Hooks.on("deleteItem", (item) =>{canvas.hud.enhancedcombathud?.checkReRender(item)})
-Hooks.on("createItem", (item) =>{canvas.hud.enhancedcombathud?.checkReRender(item)})
+Hooks.on("updateItem", (item) => { canvas.hud.enhancedcombathud?.checkReRender(item) })
+Hooks.on("deleteItem", (item) => { canvas.hud.enhancedcombathud?.checkReRender(item) })
+Hooks.on("createItem", (item) => { canvas.hud.enhancedcombathud?.checkReRender(item) })
